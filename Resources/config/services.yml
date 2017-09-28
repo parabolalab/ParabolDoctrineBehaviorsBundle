@@ -1,0 +1,14 @@
+imports: 
+  - { resource: ../../../../../vendor/knplabs/doctrine-behaviors/config/orm-services.yml }
+
+parameters:
+    knp.doctrine_behaviors.softdeletable_subscriber.class: Parabol\DoctrineBehaviorsBundle\SoftDeletable\SoftDeletableListener
+services:
+    parabol.class_analyzer:
+        class:   Parabol\DoctrineBehaviorsBundle\Reflection\ClassAnalyzer
+    parabol.subscriber.sortable:
+        class: Parabol\DoctrineBehaviorsBundle\Sortable\SortableListener
+        arguments:
+            - "@knp.doctrine_behaviors.reflection.class_analyzer"
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }   
