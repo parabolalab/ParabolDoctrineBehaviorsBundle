@@ -1,0 +1,5 @@
+doctrine:
+    orm:
+        dql:
+            string_functions:
+                regexp: DoctrineExtensions\Query\Mysql\Regexp

@@ -3,6 +3,7 @@ imports:
 
 parameters:
     knp.doctrine_behaviors.softdeletable_subscriber.class: Parabol\DoctrineBehaviorsBundle\SoftDeletable\SoftDeletableListener
+    knp.doctrine_behaviors.sluggable_subscriber.class: Parabol\DoctrineBehaviorsBundle\EventListener\SluggableSubscriber
 services:
     parabol.class_analyzer:
         class:   Parabol\DoctrineBehaviorsBundle\Reflection\ClassAnalyzer
