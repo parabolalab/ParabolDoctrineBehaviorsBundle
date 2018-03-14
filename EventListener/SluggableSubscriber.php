@@ -45,8 +45,19 @@ class SluggableSubscriber extends \Knp\DoctrineBehaviors\ORM\Sluggable\Sluggable
             $entityManager = $args->getEntityManager();
             $queryBuilder = $entityManager->createQueryBuilder();
 
-            $query = $queryBuilder->select('n, n.slug as length')->from(get_class($entity), 'n')
-                                  ->andWhere("regexp(n.slug, '^" . $entity->getSlug() . "[-]{0,1}[0-9]*$') != false");
+            
+
+            $query = $queryBuilder->select('n, n.slug as length')
+                                  ->from(get_class($entity), 'n');
+
+            if(method_exists($entity, 'addSluggableScope'))
+            {
+              $entity->addSluggableScope($query);
+              
+
+            }
+            // die();                        
+                $query->andWhere("regexp(n.slug, '^" . $entity->getSlug() . "[-]{0,1}[0-9]*$') != false");
                  if (method_exists($entity, 'getLocale')){
                      $query->andWhere("n.locale = '" . $entity->getLocale() . "'");
                  }
@@ -56,7 +67,6 @@ class SluggableSubscriber extends \Knp\DoctrineBehaviors\ORM\Sluggable\Sluggable
 
 
              $result = $query->getQuery()->getOneOrNullResult(); 
-
 
             
             
