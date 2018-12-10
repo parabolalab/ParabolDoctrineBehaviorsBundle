@@ -32,11 +32,15 @@ class SortableListener extends \Knp\DoctrineBehaviors\ORM\AbstractSubscriber
         $refClass = new \ReflectionClass($repository);
         if($this->getClassAnalyzer()->hasTrait($refClass, 'Parabol\DoctrineBehaviorsBundle\Sortable\Entity\SortableRepository'))
         {
+            
             if($repository->sortOrder() == 'desc')
             {
-                $maxsort = $repository->createQueryBuilder('a')->select('MAX(a.sort)')->getQuery()->getSingleScalarResult();
+                $qb = $repository->createQueryBuilder('e')->select('MAX(e.sort)');
+                $repository->addSortingScope($qb, $entity);
+                $maxsort = $qb->getQuery()->getSingleScalarResult();
                 $entity->setSort($maxsort + 1);
             }
+
         }
     }
 

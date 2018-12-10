@@ -76,7 +76,6 @@ trait SortableRepository
 
     protected function addSortingScope(\Doctrine\ORM\QueryBuilder $qb, $entity)
     {
-
     }
 
     public function sortOrder()
