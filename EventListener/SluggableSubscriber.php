@@ -47,7 +47,7 @@ class SluggableSubscriber extends \Knp\DoctrineBehaviors\ORM\Sluggable\Sluggable
 
             
 
-            $query = $queryBuilder->select('n, n.slug as length')
+            $query = $queryBuilder->select('n, LENGTH(n.slug) as length')
                                   ->from(get_class($entity), 'n');
 
             if(method_exists($entity, 'addSluggableScope'))
