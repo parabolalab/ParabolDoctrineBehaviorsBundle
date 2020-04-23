@@ -8,6 +8,8 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Parabol\AdminCoreBundle\Entity\Path;
 use Parabol\AdminCoreBundle\Entity\PathTransation;
 use Parabol\BaseBundle\Util\PathUtil;
+use Parabol\DoctrineBehaviorsBundle\Sortable\Entity\SortableRepository;
+use Knp\DoctrineBehaviors\Model\Sortable\Sortable;
 
 class SortableListener extends \Knp\DoctrineBehaviors\ORM\AbstractSubscriber
 {
@@ -30,7 +32,14 @@ class SortableListener extends \Knp\DoctrineBehaviors\ORM\AbstractSubscriber
         $entity = $args->getObject();
         $repository = $args->getEntityManager()->getRepository(get_class($entity));
         $refClass = new \ReflectionClass($repository);
-        if($this->getClassAnalyzer()->hasTrait($refClass, 'Parabol\DoctrineBehaviorsBundle\Sortable\Entity\SortableRepository'))
+
+       
+        $isSortable = $this->getClassAnalyzer()->hasTrait($refClass, SortableRepository::class);
+        if(!$isSortable && $refClass->getParentClass()) {
+            $isSortable = $this->getClassAnalyzer()->hasTrait($refClass->getParentClass(), SortableRepository::class);
+        }
+
+        if($isSortable)
         {
             if($repository->sortOrder() == 'desc')
             {
@@ -48,7 +57,7 @@ class SortableListener extends \Knp\DoctrineBehaviors\ORM\AbstractSubscriber
 
         foreach ($uow->getScheduledEntityInsertions() as $inserted) {
             $refClass = new \ReflectionClass($inserted);
-            if($this->getClassAnalyzer()->hasTrait($refClass, 'Knp\DoctrineBehaviors\Model\Sortable\Sortable'))
+            if($this->getClassAnalyzer()->hasTrait($refClass, Sortable::class))
             {
                 if($em->getRepository(get_class($inserted))->sortOrder() == 'asc')                  
                 $em->getRepository(get_class($inserted))->reorder($inserted, $inserted->getSort());
@@ -57,7 +66,7 @@ class SortableListener extends \Knp\DoctrineBehaviors\ORM\AbstractSubscriber
 
         foreach ($uow->getScheduledEntityUpdates() as $updated) {
             $refClass = new \ReflectionClass($updated);
-            if($this->getClassAnalyzer()->hasTrait($refClass, 'Knp\DoctrineBehaviors\Model\Sortable\Sortable'))
+            if($this->getClassAnalyzer()->hasTrait($refClass, Sortable::class))
             {
                 $changeSet = $uow->getEntityChangeSet($updated);
                 if(isset($changeSet['sort']))
@@ -69,7 +78,7 @@ class SortableListener extends \Knp\DoctrineBehaviors\ORM\AbstractSubscriber
 
         foreach ($uow->getScheduledEntityDeletions() as $deleted) {
             $refClass = new \ReflectionClass($deleted);
-            if($this->getClassAnalyzer()->hasTrait($refClass, 'Knp\DoctrineBehaviors\Model\Sortable\Sortable'))
+            if($this->getClassAnalyzer()->hasTrait($refClass, Sortable::class))
             {
                 $em->getRepository(get_class($deleted))->reorder($deleted, null);
             } 
