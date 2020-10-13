@@ -16,7 +16,7 @@
     ],
     "require" : {
         "php": ">=7.4.0",
-        "beberlei/DoctrineExtensions": "^1.0",
+        "beberlei/doctrineextensions": "^1.2",
         "knplabs/doctrine-behaviors": "^2"
     },
     "autoload": {
