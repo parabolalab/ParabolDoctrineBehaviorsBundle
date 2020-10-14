@@ -16,7 +16,7 @@
     "require" : {
         "php": ">=7.1.0",
         "beberlei/doctrineextensions": "^1.2",
-        "knplabs/doctrine-behaviors": "^2.0"
+        "knplabs/doctrine-behaviors": "^1.6"
     },
     "autoload": {
         "psr-4": { "Parabol\\DoctrineBehaviorsBundle\\": "" }
