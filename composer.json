@@ -1,6 +1,5 @@
 {
     "name": "parabol/parabol-doctrine-behaviors-bundle",
-    "version": "master",
     "type": "symfony-bundle",
     "minimum-stability": "dev",
     "description": "Extends for Knp/doctrine-behaviors",
