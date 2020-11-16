@@ -8,7 +8,6 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Parabol\AdminCoreBundle\Entity\Path;
 use Parabol\AdminCoreBundle\Entity\PathTransation;
 use Parabol\BaseBundle\Util\PathUtil;
-use Parabol\DoctrineBehaviorsBundle\Sortable\Entity\SortableRepository;
 use Knp\DoctrineBehaviors\Model\Sortable\Sortable;
 
 class SortableListener extends \Knp\DoctrineBehaviors\ORM\AbstractSubscriber
@@ -29,24 +28,24 @@ class SortableListener extends \Knp\DoctrineBehaviors\ORM\AbstractSubscriber
 
     public function prePersist(LifecycleEventArgs $args)
     {
+
+
         $entity = $args->getObject();
         $repository = $args->getEntityManager()->getRepository(get_class($entity));
         $refClass = new \ReflectionClass($repository);
 
-       
-        $isSortable = $this->getClassAnalyzer()->hasTrait($refClass, SortableRepository::class);
-        if(!$isSortable && $refClass->getParentClass()) {
-            $isSortable = $this->getClassAnalyzer()->hasTrait($refClass->getParentClass(), SortableRepository::class);
-        }
+        
 
-        if($isSortable)
+
+        if($this->getClassAnalyzer()->hasTrait($refClass, 'Parabol\DoctrineBehaviorsBundle\Sortable\Entity\SortableRepository', true))
         {
             if($repository->sortOrder() == 'desc')
             {
-                $maxsort = $repository->createQueryBuilder('a')->select('MAX(a.sort)')->getQuery()->getSingleScalarResult();
-                $entity->setSort($maxsort + 1);
+                $sort = $repository->getMaxSort($entity);
+                if($sort !== null) $entity->setSort( $sort );
             }
         }
+
     }
 
     public function onFlush(OnFlushEventArgs $args)

@@ -18,6 +18,8 @@ trait SortableRepository
             ->update($this->getEntityName(), 'e')
             ;
 
+        $this->addSortingScope($qb, $entity);
+
         if(is_array($sort))
         {
             // var_dump($sort);
@@ -60,7 +62,7 @@ trait SortableRepository
         
         $entity->setReordered();
 
-        $this->addSortingScope($qb, $entity);
+       
 
         // echo $qb->getQuery()->getSql();
         // die();
@@ -74,9 +76,20 @@ trait SortableRepository
         ;
     }
 
-    protected function addSortingScope(\Doctrine\ORM\QueryBuilder $qb, $entity)
+    public function addSortingScope(\Doctrine\ORM\QueryBuilder $qb, $entity)
     {
     }
+
+    public function getMaxSort($entity)
+    {
+        $qb = $this->createQueryBuilder('e')->select('MAX(e.sort)');
+        $this->addSortingScope($qb, $entity);
+
+        return $qb->getQuery()->getSingleScalarResult() + 1;  
+
+    }  
+
+    
 
     public function sortOrder()
     {
