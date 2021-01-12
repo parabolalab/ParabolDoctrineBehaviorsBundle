@@ -7,7 +7,6 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Parabol\AdminCoreBundle\Entity\Path;
 use Parabol\AdminCoreBundle\Entity\PathTransation;
-use Parabol\BaseBundle\Util\PathUtil;
 use Knp\DoctrineBehaviors\Model\Sortable\Sortable;
 
 class SortableListener extends \Knp\DoctrineBehaviors\ORM\AbstractSubscriber
