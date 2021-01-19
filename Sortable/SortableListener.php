@@ -8,21 +8,65 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Parabol\AdminCoreBundle\Entity\Path;
 use Parabol\AdminCoreBundle\Entity\PathTransation;
 use Knp\DoctrineBehaviors\Model\Sortable\Sortable;
+use Parabol\DoctrineBehaviorsBundle\Reflection\ClassAnalyzer;
 
-class SortableListener extends \Knp\DoctrineBehaviors\ORM\AbstractSubscriber
+use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Events;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
+class SortableListener implements EventSubscriber
 {
+    private $classAnalyser;
+    protected $isRecursive;
+    protected $sortableTrait;
 	
-     public function __construct(\Knp\DoctrineBehaviors\Reflection\ClassAnalyzer $classAnalyser)
+    public function __construct(ClassAnalyzer $classAnalyser, $sortableTrait, $isRecursive)
     {
-        parent::__construct($classAnalyser, true);
+        $this->classAnalyser = $classAnalyser;
+        $this->sortableTrait = $sortableTrait;
+        $this->isRecursive   = (bool) $isRecursive;
     }
 
     public function getSubscribedEvents()
     {
         return array(
-            'prePersist',
-            'onFlush',
+            Events::prePersist,
+            Events::onFlush,
+            Events::loadClassMetadata
         );
+    }
+
+    protected function getClassAnalyzer()
+    {
+        return $this->classAnalyser;
+    }
+
+    private function isSortable(ClassMetadata $classMetadata)
+    {
+        return $this->getClassAnalyzer()->hasTrait(
+            $classMetadata->reflClass,
+            $this->sortableTrait,
+            $this->isRecursive
+        );
+    }
+
+    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
+    {
+        $classMetadata = $eventArgs->getClassMetadata();
+
+        if (null === $classMetadata->reflClass) {
+            return;
+        }
+
+        if ($this->isSortable($classMetadata)) {
+
+            if (!$classMetadata->hasField('sort')) {
+                $classMetadata->mapField(array(
+                    'fieldName' => 'sort',
+                    'type'      => 'integer'
+                ));
+            }
+        }
     }
 
     public function prePersist(LifecycleEventArgs $args)
