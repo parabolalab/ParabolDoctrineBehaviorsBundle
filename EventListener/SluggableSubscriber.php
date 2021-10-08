@@ -25,7 +25,6 @@ class SluggableSubscriber extends \Knp\DoctrineBehaviors\ORM\Sluggable\Sluggable
     {
 
         $entity = $args->getEntity();
-        
         if (method_exists($entity, 'getSlug')) {
 
             $uow = $args->getEntityManager()->getUnitOfWork();
@@ -56,14 +55,21 @@ class SluggableSubscriber extends \Knp\DoctrineBehaviors\ORM\Sluggable\Sluggable
               
 
             }
-            // die();                        
-                $query->andWhere("regexp(n.slug, '^" . $entity->getSlug() . "[-]{0,1}[0-9]*$') != false");
-                 if (method_exists($entity, 'getLocale')){
-                     $query->andWhere("n.locale = '" . $entity->getLocale() . "'");
-                 }
-                 $query->addOrderBy('length', 'DESC')
-                       ->addOrderBy('n.slug', 'DESC')
-                       ->setMaxResults(1);
+
+            $query
+                ->andWhere("n.slug = :slug OR regexp(n.slug, '^" . $entity->getSlug() . "[-]{0,1}[0-9]*$') != false")
+                ->setParameter('slug', $entity->getSlug())
+            ;
+
+             if (method_exists($entity, 'getLocale')){
+                 $query->andWhere("n.locale = '" . $entity->getLocale() . "'");
+             }
+
+            $query
+                ->addOrderBy('length', 'DESC')
+                ->addOrderBy('n.slug', 'DESC')
+                ->setMaxResults(1)
+            ;
 
 
              $result = $query->getQuery()->getOneOrNullResult(); 
