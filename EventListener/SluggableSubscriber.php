@@ -56,14 +56,11 @@ class SluggableSubscriber extends \Knp\DoctrineBehaviors\ORM\Sluggable\Sluggable
 
             }
 
-            $query
-                ->andWhere("n.slug = :slug OR regexp(n.slug, '^" . $entity->getSlug() . "[-]{0,1}[0-9]*$') != false")
-                ->setParameter('slug', $entity->getSlug())
-            ;
-
-             if (method_exists($entity, 'getLocale')){
-                 $query->andWhere("n.locale = '" . $entity->getLocale() . "'");
-             }
+            $query->andWhere("n.slug = :slug OR regexp(n.slug, '^" . $entity->getSlug() . "[-]{1}[1-9]{1}[0-9]*$') != false")->setParameter('slug', $entity->getSlug());
+            
+            if (method_exists($entity, 'getLocale')){
+                $query->andWhere("n.locale = '" . $entity->getLocale() . "'");
+            }
 
             $query
                 ->addOrderBy('length', 'DESC')
@@ -71,22 +68,29 @@ class SluggableSubscriber extends \Knp\DoctrineBehaviors\ORM\Sluggable\Sluggable
                 ->setMaxResults(1)
             ;
 
-
-             $result = $query->getQuery()->getOneOrNullResult(); 
-
-            
+            $result = $query->getQuery()->getOneOrNullResult(); 
+                         
             
             if (null !== $result) {
-                $explode = explode('-', $result[0]->getSlug());
-                $lastE = count($explode) - 1;
-                if (count($explode) && isset($explode[$lastE]) && ctype_digit($explode[$lastE])) {
-                    $explode[$lastE] = $explode[$lastE] + 1;
-                    $slug = implode('-', $explode);
-                    $entity->setSlug($slug);
-                } else {
-                    $entity->setSlug($entity->getSlug() . '-2');
+
+                $slug = $entity->getSlug() . '-2';
+
+                if(str_replace($entity->getSlug(), '', $result[0]->getSlug()))
+                {
+                    $explode = explode('-', $result[0]->getSlug());
+                    $lastE = count($explode) - 1;
+                    if (count($explode) && isset($explode[$lastE]) && ctype_digit($explode[$lastE])) {
+                        $explode[$lastE] = $explode[$lastE] + 1;
+                        $slug = implode('-', $explode);
+                        
+                    }
                 }
+                
+                
+                 $entity->setSlug($slug);
+                
             }
+
 
         }
     }
